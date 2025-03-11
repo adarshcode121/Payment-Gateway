@@ -28,21 +28,114 @@ $order = $result->fetch_assoc();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Bill</title>
+    <title>Order Bill - Flipkart Style</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        .center{
-            display: flex;
-            justify-content: center;
-        }
+       /* Background settings */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-image: url(b1.png);
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden; /* Prevents scroll while animating */
+    position: relative;
+}
+
+/* Dark Overlay Effect */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 0;
+}
+
+/* Popup Animation for Order Summary */
+.container {
+    max-width: 700px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+    transform: scale(0.8);
+    opacity: 0;
+    animation: popupFade 0.4s ease-out forwards;
+}
+
+/* Keyframes for Popup Effect */
+@keyframes popupFade {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background: #f0f0f0;
+    color: #333;
+    font-weight: bold;
+}
+
+tr:hover {
+    background: #f9f9f9;
+}
+
+/* Payment Button */
+.pay-button {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin-top: 20px;
+    background-color: #fb641b;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.pay-button:hover {
+    background-color: #e05b1b;
+}
+
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
-    <h2 class="center">Order Details</h2>
-    <main class="center">
-        
-        <table border="1" cellpadding="10" cellspacing="0">
+
+    <div class="container">
+        <h2>Order Summary</h2>
+        <table>
             <tr>
                 <th>Order ID</th>
                 <td><?php echo $order['id']; ?></td>
@@ -75,17 +168,13 @@ $order = $result->fetch_assoc();
                 <th>Grand Total</th>
                 <td id="grand_total">₹<?php echo number_format($order['grand_total'], 2); ?></td>
             </tr>
-            
         </table>
 
-        
-    </main>
-    <!-- Payment Button -->
-        <div style="margin-top: 20px;" class="center">
-            <button id="pay-now" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; cursor: pointer;">Pay Now</button>
-        </div>
+        <!-- Payment Button -->
+        <button id="pay-now" class="pay-button">Proceed to Pay</button>
+    </div>
 
-    <script>
+<script>
     $('#pay-now').click(function(e) {
         var amount = <?php echo $order['grand_total'] * 100; ?>; // Convert to paisa
         var name = '<?php echo htmlspecialchars($order['name']); ?>';
@@ -105,7 +194,7 @@ $order = $result->fetch_assoc();
             "key": "rzp_test_oFL88BWKa4IHEK", // Replace with your Razorpay Key ID
             "amount": amount,
             "currency": "INR",
-            "name": "Datastore",
+            "name": "Flipkart Store",
             "description": "Payment for your purchase",
             "image": "https://via.placeholder.com/150", // Replace with your logo URL
             "prefill": {
@@ -114,7 +203,7 @@ $order = $result->fetch_assoc();
                 "contact": phone
             },
             "theme": {
-                "color": "#F37254"
+                "color": "#2874f0"
             },
             "handler": function(response) {
                 // AJAX call to process the payment
@@ -133,9 +222,8 @@ $order = $result->fetch_assoc();
                         order_id: order_id
                     },
                     success: function() {
-                        // Redirect to the homepage after successful payment
                         alert('Payment successful!');
-                        window.location.href = 'product.php'; // Change 'index.php' to your homepage file
+                        window.location.href = 'product.php'; // Change as needed
                     },
                     error: function() {
                         alert('Payment failed. Please try again.');
